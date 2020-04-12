@@ -7,8 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 
-	"github.com/CodexTapes/go-gin-restApi/api"
-	"github.com/CodexTapes/go-gin-restApi/models"
+	api "github.com/CodexTapes/go-gin-restApi/api"
+	models "github.com/CodexTapes/go-gin-restApi/models"
 )
 
 func main() {
@@ -19,7 +19,9 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	models.InitDB(os.Getenv("DB_DRIVER"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_PORT"), os.Getenv("DB_HOST"), os.Getenv("DB_NAME"))
+	db := models.InitDB(os.Getenv("DB_DRIVER"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_PORT"), os.Getenv("DB_HOST"), os.Getenv("DB_NAME"))
+
+	defer db.Close()
 
 	router.GET("/movies", api.GetAllMovies)
 	router.POST("/movies", api.CreateMovie)
