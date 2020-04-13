@@ -1,0 +1,40 @@
+version: '3'
+
+# Services Definition
+services: 
+
+  # App Service
+  app:
+    container_name: gin_rest_api
+    build: 
+      context: . # Use image built from the dockerfile in the current directory.
+      dockerfile: Dockerfile
+    ports: 
+      - "8080:8080"
+    restart: unless-stopped
+    depends_on: 
+      - postgres
+    environment: 
+      POSTGRES_URL: 
+    networks: 
+      - gin-rest-api
+    
+    # Postgres Service  
+    postgres:
+      image: "postgres:alpine"
+      container_name: gin_rest_api_db
+      environment:
+      - POSTGRES_USER=${DB_USER}  
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - DATABASE_HOST=${DB_HOST} 
+      ports:
+      - '5432:5432'
+      restart: unless-stopped
+      networks: 
+        - gin-rest-api
+  
+  # Networks for communication between containers      
+  networks: 
+      gin-rest-api:
+        driver: bridge
