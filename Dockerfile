@@ -1,5 +1,11 @@
 # Base Image
-FROM golang:1.13-alpine
+FROM golang:1.13-alpine as builder
+
+# Set environmet variables for image
+ENV GO111MODULE=auto \
+    CGO_ENABLED=0 \
+    GOOS=linux \
+    GOARCH=amd64
 
 # Add tools not present in base image
 RUN apk update && apk upgrade && \
