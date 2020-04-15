@@ -1,18 +1,18 @@
 # Base Image
-FROM golang:1.13-alpine as builder
+FROM golang:1.13.0-alpine3.10 as builder
+
+# Maintainer Info
+LABEL maintainer="Amir <amir.xx8080@gmail.com>"
 
 # Set environmet variables for image
-ENV GO111MODULE=auto \
-    CGO_ENABLED=0 \
-    GOOS=linux \
-    GOARCH=amd64
+# ENV GO111MODULE=auto \
+#     CGO_ENABLED=0 \
+#     GOOS=linux \
+#     GOARCH=amd64
 
 # Add tools not present in base image
 RUN apk update && apk upgrade && \
     apk add --no-cache bash git
-
-# Maintainer Info
-LABEL maintainer="Amir <amir.xx8080@gmail.com>"
 
 # Set Working Directory inside the container
 WORKDIR /app
@@ -27,11 +27,21 @@ RUN go mod download
 COPY . .
 
 # Build the Go app
-RUN go build -o main .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+
+# Start a new stage from scratch
+FROM alpine:latest
+
+RUN apk --no-cache add ca-certificates
+
+WORKDIR /root/
+
+# Copy the Pre-built binary file from the previous stage. Copy the .env file.
+COPY --from=builder /app/main .
+COPY --from=builder /app/.env .       
 
 # Expose port 8080 to the outside world
-EXPOSE 8080
+EXPOSE 3000
 
 # Run the executable
 CMD ["./main"]
-
