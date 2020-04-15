@@ -18,5 +18,5 @@ type MovieCollection struct {
 	Movies []Movie
 }
 
-// Archive - Collection Pointer
+// Archive - MovieCollection Pointer
 var Archive *MovieCollection
